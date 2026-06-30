@@ -1,0 +1,122 @@
+{% extends 'store/base.html' %}
+{% block title %}Shopping Cart – VelvetCart{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="page-title">🛒 Shopping Cart</h1>
+
+  {% if cart_items %}
+  <div class="cart-layout">
+    <!-- Items -->
+    <div class="cart-items">
+      {% for item in cart_items %}
+      <div class="cart-item" id="cart-item-{{ item.product.id }}">
+        <div class="cart-item-image">
+          {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+          {% else %}
+            <div class="product-img-placeholder small">{{ item.product.name|first }}</div>
+          {% endif %}
+        </div>
+        <div class="cart-item-details">
+          <h3><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></h3>
+          <span class="cart-item-price">₹{{ item.product.price }} each</span>
+        </div>
+        <div class="cart-item-qty">
+          <form action="{% url 'store:cart_update' item.product.id %}" method="post" class="qty-update-form" data-product="{{ item.product.id }}">
+            {% csrf_token %}
+            <div class="qty-control">
+              <button type="button" class="qty-btn" onclick="updateQty({{ item.product.id }}, -1)">−</button>
+              <input type="number" name="quantity" value="{{ item.quantity }}"
+                     min="1" max="{{ item.product.stock }}"
+                     class="qty-input" id="qty-{{ item.product.id }}"
+                     onchange="submitQtyForm({{ item.product.id }})">
+              <button type="button" class="qty-btn" onclick="updateQty({{ item.product.id }}, 1)">+</button>
+            </div>
+          </form>
+        </div>
+        <div class="cart-item-subtotal" id="subtotal-{{ item.product.id }}">
+          ₹{{ item.subtotal }}
+        </div>
+        <form action="{% url 'store:cart_remove' item.product.id %}" method="post" class="remove-form">
+          {% csrf_token %}
+          <button type="submit" class="remove-btn" title="Remove">✕</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Summary -->
+    <div class="cart-summary">
+      <h3>Order Summary</h3>
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span id="cart-total">₹{{ total }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Shipping</span>
+        <span class="free-ship">Free</span>
+      </div>
+      <div class="summary-row summary-total">
+        <span>Total</span>
+        <span id="cart-grand-total">₹{{ total }}</span>
+      </div>
+      {% if user.is_authenticated %}
+      <a href="{% url 'store:checkout' %}" class="btn btn-primary btn-lg btn-block">
+        Proceed to Checkout →
+      </a>
+      {% else %}
+      <a href="{% url 'store:login' %}?next={% url 'store:checkout' %}" class="btn btn-primary btn-lg btn-block">
+        Login to Checkout →
+      </a>
+      {% endif %}
+      <a href="{% url 'store:product_list' %}" class="btn btn-outline btn-lg btn-block" style="margin-top:.75rem;">
+        ← Continue Shopping
+      </a>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🛒</div>
+    <h3>Your cart is empty</h3>
+    <p>Looks like you haven't added anything yet.</p>
+    <a href="{% url 'store:product_list' %}" class="btn btn-primary">Start Shopping</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateQty(productId, delta) {
+  const input = document.getElementById(`qty-${productId}`);
+  const newVal = Math.max(1, parseInt(input.value) + delta);
+  input.value = newVal;
+  submitQtyForm(productId);
+}
+
+function submitQtyForm(productId) {
+  const form = document.querySelector(`.qty-update-form[data-product="${productId}"]`);
+  const input = document.getElementById(`qty-${productId}`);
+  const qty = parseInt(input.value);
+
+  const formData = new FormData(form);
+
+  fetch(form.action, {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById(`subtotal-${productId}`).textContent = `₹${data.subtotal.toFixed(2)}`;
+      document.getElementById('cart-total').textContent = `₹${data.cart_total.toFixed(2)}`;
+      document.getElementById('cart-grand-total').textContent = `₹${data.cart_total.toFixed(2)}`;
+      document.getElementById('cart-count').textContent = data.cart_count;
+    }
+  });
+}
+</script>
+{% endblock %}

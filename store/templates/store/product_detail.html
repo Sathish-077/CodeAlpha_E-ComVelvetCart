@@ -1,0 +1,115 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ product.name }} – VelvetCart{% endblock %}
+
+{% block content %}
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="{% url 'store:product_list' %}">Home</a> /
+    <a href="{% url 'store:product_list' %}?category={{ product.category.slug }}">{{ product.category.name }}</a> /
+    <span>{{ product.name }}</span>
+  </nav>
+
+  <div class="product-detail-grid">
+    <!-- Image -->
+    <div class="product-detail-image">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+      {% else %}
+        <div class="product-img-placeholder large">{{ product.name|first }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Info -->
+    <div class="product-detail-info">
+      <span class="product-category">{{ product.category.name }}</span>
+      <h1 class="product-detail-name">{{ product.name }}</h1>
+      <div class="product-detail-price">₹{{ product.price }}</div>
+
+      <div class="stock-info">
+        {% if product.stock > 0 %}
+          <span class="in-stock">✔ In Stock ({{ product.stock }} available)</span>
+        {% else %}
+          <span class="out-of-stock">✘ Out of Stock</span>
+        {% endif %}
+      </div>
+
+      <div class="product-description">
+        <h3>Description</h3>
+        <p>{{ product.description }}</p>
+      </div>
+
+      {% if product.stock > 0 %}
+      <form action="{% url 'store:cart_add' product.id %}" method="post" class="add-to-cart-detail">
+        {% csrf_token %}
+        <div class="quantity-row">
+          <label for="qty">Quantity:</label>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
+            <input type="number" id="qty" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input">
+            <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button type="submit" class="btn btn-primary btn-lg">🛒 Add to Cart</button>
+          <a href="{% url 'store:cart_detail' %}" class="btn btn-outline btn-lg">View Cart</a>
+        </div>
+      </form>
+      {% else %}
+      <div class="action-buttons">
+        <button class="btn btn-primary btn-lg" disabled>Out of Stock</button>
+      </div>
+      {% endif %}
+
+      <div class="product-meta">
+        <span>Category: <strong>{{ product.category.name }}</strong></span>
+        <span>Added: <strong>{{ product.created|date:"M d, Y" }}</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  {% if related %}
+  <section class="related-section">
+    <h2>Related Products</h2>
+    <div class="product-grid">
+      {% for p in related %}
+      <div class="product-card">
+        <a href="{{ p.get_absolute_url }}" class="product-image-link">
+          {% if p.image %}
+            <img src="{{ p.image.url }}" alt="{{ p.name }}" class="product-img">
+          {% else %}
+            <div class="product-img-placeholder">{{ p.name|first }}</div>
+          {% endif %}
+        </a>
+        <div class="product-info">
+          <h3 class="product-name"><a href="{{ p.get_absolute_url }}">{{ p.name }}</a></h3>
+          <div class="product-footer">
+            <span class="product-price">₹{{ p.price }}</span>
+            {% if p.stock > 0 %}
+            <form action="{% url 'store:cart_add' p.id %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary btn-sm">+ Cart</button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changeQty(delta) {
+  const input = document.getElementById('qty');
+  const max = parseInt(input.max);
+  const newVal = Math.max(1, Math.min(max, parseInt(input.value) + delta));
+  input.value = newVal;
+}
+</script>
+{% endblock %}

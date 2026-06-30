@@ -1,0 +1,21 @@
+{% extends 'store/base.html' %}
+{% block title %}Order Confirmed – VelvetCart{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="confirmation-box">
+    <div class="confirm-icon">✅</div>
+    <h1>Order Placed!</h1>
+    <p>Thank you for your purchase. Your order <strong>#{{ order.id }}</strong> has been received.</p>
+    <div class="confirm-details">
+      <div class="confirm-row"><span>Order ID</span><strong>#{{ order.id }}</strong></div>
+      <div class="confirm-row"><span>Status</span><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></div>
+      <div class="confirm-row"><span>Total</span><strong>₹{{ order.get_total_cost }}</strong></div>
+      <div class="confirm-row"><span>Payment</span><strong>{{ order.get_payment_method_display }}</strong></div>
+    </div>
+    <div class="confirm-actions">
+      <a href="{% url 'store:order_detail' order.id %}" class="btn btn-primary">View Order Details</a>
+      <a href="{% url 'store:product_list' %}" class="btn btn-outline">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
