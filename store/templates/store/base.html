@@ -23,7 +23,7 @@
       <input type="text" name="q" placeholder="Search products…" value="{{ request.GET.q }}">
       <button type="submit">🔍</button>
     </form>
-
+    
     <div class="nav-links">
       {% if user.is_authenticated %}
         <a href="{% url 'store:profile' %}" class="nav-link">👤 {{ user.username }}</a>
