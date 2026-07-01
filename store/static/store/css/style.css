@@ -388,3 +388,26 @@ address { font-style: normal; line-height: 1.8; font-size: .95rem; }
     padding: .75rem;
   }
 }
+/* ── Mobile Filter Toggle ─────────────────────────── */
+.filter-toggle-btn {
+  display: none;
+  width: 100%;
+  padding: .75rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 900px) {
+  .filter-toggle-btn { display: block; }
+  .sidebar {
+    display: none;
+    margin-bottom: 1rem;
+  }
+  .sidebar.open { display: block; }
+}

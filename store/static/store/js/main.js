@@ -74,4 +74,9 @@ document.addEventListener('click', function(e) {
   if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
     menu.classList.remove('open');
   }
-});s
+});
+
+// ── Mobile Filter Toggle ─────────────────────────────
+function toggleFilter() {
+  document.querySelector('.sidebar').classList.toggle('open');
+}
