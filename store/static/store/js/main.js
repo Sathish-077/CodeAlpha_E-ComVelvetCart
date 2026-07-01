@@ -62,3 +62,16 @@ window.changeQty = function(delta) {
   const max = parseInt(input.max) || 99;
   input.value = Math.max(1, Math.min(max, parseInt(input.value || 1) + delta));
 };
+
+// ── Mobile Hamburger Menu ────────────────────────────
+function toggleMenu() {
+  document.querySelector('.nav-links').classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const menu = document.querySelector('.nav-links');
+  const btn = document.getElementById('hamburger-btn');
+  if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
+    menu.classList.remove('open');
+  }
+});s

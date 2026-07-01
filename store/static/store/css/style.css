@@ -352,3 +352,38 @@ address { font-style: normal; line-height: 1.8; font-size: .95rem; }
   .nav-inner { gap: .75rem; }
   .form-row.two-col { grid-template-columns: 1fr; }
 }
+
+/* ── Mobile Hamburger Menu ────────────────────────── */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: .4rem .6rem;
+}
+
+@media (max-width: 768px) {
+  .hamburger { display: block; }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: var(--primary);
+    width: 200px;
+    flex-direction: column;
+    padding: 1rem;
+    border-radius: 0 0 0 12px;
+    box-shadow: var(--shadow);
+    z-index: 200;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links .nav-link,
+  .nav-links .cart-btn {
+    width: 100%;
+    text-align: center;
+    padding: .75rem;
+  }
+}
